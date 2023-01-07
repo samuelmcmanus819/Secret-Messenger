@@ -1,2 +1,4 @@
 # Extension
-frontend/extension/*
+frontend/extension/next
+frontend/extension/next-assets
+frontend/extension/*.html
