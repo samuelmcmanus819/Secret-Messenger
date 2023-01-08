@@ -5,3 +5,5 @@ frontend/extension/*.html
 
 # Contract
 contract/target
+contract/contract.wasm
+contract/contract.wasm.gz
