@@ -3,7 +3,17 @@ frontend/extension/next
 frontend/extension/next-assets
 frontend/extension/*.html
 
+# Frontend resources generated at build
+frontend/node_modules
+frontend/.next
+
 # Contract
 contract/target
 contract/contract.wasm
 contract/contract.wasm.gz
+
+# In case I run yarn in the wrong directory
+yarn.lock
+node_modules
+contract/yarn.lock
+contract/node_modules

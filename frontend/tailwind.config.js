@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const defaultTheme = require('tailwindcss/defaultTheme');
+
 module.exports = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx}',
@@ -8,7 +10,12 @@ module.exports = {
     colors: {
       'primary-main': '#151A20',
       'primary-light': '#20252A',
-      'primary-ultralight': '#2A2F34'
+      'primary-ultralight': '#2A2F34',
+      'white': '#FFFFFF'
+    },
+    fontFamily: {
+      'serif': ['Domine'],
+      'header': ['Quattrocento']
     },
     extend: {},
   },
