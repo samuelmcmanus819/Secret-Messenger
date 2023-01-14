@@ -4,7 +4,7 @@ interface props {
 
 const User = ({ user }: props) => {
   return(
-    <button className="w-[130px] h-[30px] overflow-hidden text-white">
+    <button className="w-[130px] h-[30px] overflow-hidden text-dark-text">
       {user}
     </button>
   )
