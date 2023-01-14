@@ -1,10 +1,12 @@
 import type { NextPage } from 'next'
-import Head from 'next/head'
-import Image from 'next/image'
+
+import SecondaryColumn from 'components/layout/index/secondary-column'
 
 const Home: NextPage = () => {
   return (
-    <div></div>
+    <div className='flex flex-col'>
+      <SecondaryColumn />
+    </div>
   )
 }
 

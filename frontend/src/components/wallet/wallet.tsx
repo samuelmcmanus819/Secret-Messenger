@@ -1,46 +1,42 @@
-import { useWallet } from "@cosmos-kit/react";
-import { MouseEventHandler } from "react";
-import { Connected, Connecting, Disconnected, Rejected, Error, NotExist, WalletConnectComponent } from "./wallet-connect";
+import { useState } from 'react'
+import { useWallet } from 'components/wallet/wallet-context';
+import { connectKeplrWallet, connectLeapWallet } from "./wallet-login";
 
 const Wallet = () => {
-  const walletManager = useWallet(); 
-  const {
-    connect,
-    openView,
-    walletStatus,
-  } = walletManager;
+  const [connecting, setConnecting] = useState(false);
+  const { wallet, login, logout } = useWallet();
 
-  const onClickConnect: MouseEventHandler = async (e) => {
-    e.preventDefault();
-    await connect();
-  };
+  const connectClicked = () => {
+    setConnecting(true)
+  }
 
-  const onClickOpenView: MouseEventHandler = (e) => {
-    e.preventDefault();
-    openView();
-  };
+  const connectLeapClicked = () => {
+    connectLeapWallet().then(wallet => { if(wallet) { login(wallet) } });
+    setConnecting(false);
+  }
 
-  const ConnectWalletButton = (
-      <WalletConnectComponent
-        walletStatus={walletStatus}
-        disconnect={
-          <Disconnected onClick={onClickConnect} />
-        }
-        connecting={<Connecting />}
-        connected={
-          <Connected onClick={onClickOpenView} />
-        }
-        rejected={<Rejected onClick={onClickConnect} />}
-        error={<Error onClick={onClickConnect} />}
-        notExist={
-          <NotExist onClick={onClickConnect} />
-        }
-      />
-  );
+  const connectKeplrClicked = () => {
+    connectKeplrWallet().then(wallet => { if(wallet) { login(wallet) } });
+    setConnecting(false);
+  }
+
+  const disconnectWallet = () => {
+    logout();
+    setConnecting(false);
+  }
+
   return (
-    <div className="flex flex-col w-full items-center">
-      {ConnectWalletButton}
+    <div className="flex h-full w-full justify-center">
+      <button className="self-end bg-primary-ultralight mb-4 text-sm text-dark-text w-[120px] h-[35px] rounded-md overflow-hidden" 
+            onClick={wallet.address == "" ? connectClicked : disconnectWallet}>
+        {wallet.address == "" ? 'Connect Wallet': wallet.address}
+      </button>
+      <span className={`${connecting ? 'w-96 h-52 bg-primary-ultralight fixed top-[100px] left-[60px] z-5 shadow-[0px_5px_7.5px_rgba(0,0,0,0.20)]' : 'w-0 h-0' }`}>
+        <button onClick={connectLeapClicked}>{connecting ? 'Connect Leap' : ''}</button>
+        <button onClick={connectKeplrClicked}>{connecting ? 'Connect Keplr' : ''}</button>
+      </span>
     </div>
+    
   )
 }
 

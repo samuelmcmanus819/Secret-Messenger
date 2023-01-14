@@ -11,7 +11,8 @@ module.exports = {
       'primary-main': '#151A20',
       'primary-light': '#20252A',
       'primary-ultralight': '#2A2F34',
-      'white': '#FFFFFF'
+      'dark-text': '#9CA3AF',
+      'light-text': '#FFFFFF'
     },
     fontFamily: {
       'serif': ['Domine'],

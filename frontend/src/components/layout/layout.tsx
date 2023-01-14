@@ -12,12 +12,6 @@ const Layout = ({ children }: props) => {
         <HamburgerMenu /> 
       </header>
       <main className="flex flex-row h-[335px]">
-        <div className="flex flex-col h-full justify-end w-36 bg-primary-light ">
-          <Wallet />
-        </div>
-        <div className="flex flex-col w-full">
-
-        </div>
         {children}
       </main>
     </div>

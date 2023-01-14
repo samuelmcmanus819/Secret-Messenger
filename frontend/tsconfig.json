@@ -16,6 +16,6 @@
     "incremental": true,
     "baseUrl": "./src"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/components/wallet/wallet.tsx", "src/components/wallet/wallet-login.js", "src/components/layout/index/users.tsx"],
   "exclude": ["node_modules"]
 }

@@ -1,18 +1,13 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
-
-
 import Layout from 'components/layout/layout'
-import WalletProviderWrapper from 'components/wallet/wallet-provider-wrapper'
+import { WalletProvider } from 'components/wallet/wallet-context'
 
 function MyApp({ Component, pageProps }: AppProps) {
-  
-
   return (
-    <>
-      <WalletProviderWrapper children={<Layout children={<Component {...pageProps} />} />} />
-    </>
-    
+    <WalletProvider>
+      <Layout children={<Component {...pageProps} />} />
+    </WalletProvider>
   )
 }
 
