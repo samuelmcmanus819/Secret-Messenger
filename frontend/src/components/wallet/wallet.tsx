@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useWallet } from 'components/wallet/wallet-context';
+import { useWallet } from 'contexts/wallet-context';
 import { connectKeplrWallet, connectLeapWallet } from "./wallet-login";
 
 const Wallet = () => {

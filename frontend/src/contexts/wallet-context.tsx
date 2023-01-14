@@ -1,6 +1,6 @@
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { SecretNetworkClient } from "secretjs";
-import { WalletContextType } from "types/wallet.types";
+import { WalletContextProviderPropsType, WalletContextType } from "types/wallet.types";
 
 const walletContextDefaultValues: WalletContextType = {
   wallet: new SecretNetworkClient({ url: '', chainId: '' }),
@@ -12,12 +12,7 @@ const WalletContext = createContext<WalletContextType>(walletContextDefaultValue
 export const useWallet = () => {
    return useContext(WalletContext);
 }
-
-//Set up the context provider
-interface props {
-  children: ReactNode;
-}
-export const WalletProvider = ({ children }: props) => {
+export const WalletProvider = ({ children }: WalletContextProviderPropsType) => {
   const [wallet, setWallet] = useState<SecretNetworkClient>(new SecretNetworkClient({ url: '', chainId: '' }));
 
   const login = (wallet: SecretNetworkClient) => {

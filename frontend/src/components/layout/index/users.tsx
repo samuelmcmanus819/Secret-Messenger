@@ -1,5 +1,6 @@
 import UserList from "components/user-list/user-list";
-import { useWallet } from "components/wallet/wallet-context";
+import { useChattingUser } from "contexts/chatting-user-context";
+import { useWallet } from "contexts/wallet-context";
 import { useEffect, useState } from "react";
 import { SecretNetworkClient } from "secretjs";
 import { UserListType } from "types/user.types";
@@ -9,6 +10,7 @@ const Users = () => {
   const [chattableUsers, setChattableUsers] = useState<string[]>([]);
   const [searchUsers, setSearchUsers] = useState<string[]>([]);
   const { wallet } = useWallet();
+  const { deselectUser } = useChattingUser();
 
   const getUsers = (wallet: SecretNetworkClient, contractAddress: string): Promise<UserListType> => {
     return wallet.query.compute.queryContract({ contract_address: contractAddress, query: { get_chattable_users: { self_address: wallet.address } } })
@@ -25,6 +27,10 @@ const Users = () => {
   useEffect(() => {
     if(wallet.address != ''){
       getUsers(wallet, contractAddress).then(data => { setChattableUsers(data.users); setSearchUsers(data.users); })
+    } else{
+      setChattableUsers([]);
+      setSearchUsers([]);
+      deselectUser();
     }
   }, [wallet]);
 

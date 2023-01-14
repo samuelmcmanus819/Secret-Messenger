@@ -8,7 +8,7 @@ const UserList = ({ users }: UserListType) => {
         {users.map((user) => {
           return (
             <li>
-              <User user={user}/>
+              <User address={user}/>
             </li>
           )
         })}
