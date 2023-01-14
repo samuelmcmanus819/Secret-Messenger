@@ -1,8 +1,6 @@
-interface props {
-  user: string
-}
+import { UserType } from "types/user.types";
 
-const User = ({ user }: props) => {
+const User = ({ user }: UserType) => {
   return(
     <button className="w-[130px] h-[30px] overflow-hidden text-dark-text">
       {user}

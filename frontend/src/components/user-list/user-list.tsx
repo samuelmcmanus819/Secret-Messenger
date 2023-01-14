@@ -1,10 +1,8 @@
+import { UserListType } from "types/user.types";
 import User from "./user";
 
-interface props {
-  users: string[],
-}
 
-const UserList = ({ users }: props) => {
+const UserList = ({ users }: UserListType) => {
   return (
     <ul className="mt-2">
         {users.map((user) => {

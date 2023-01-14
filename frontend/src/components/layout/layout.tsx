@@ -1,5 +1,4 @@
 import HamburgerMenu from "components/layout/header/hamburger-menu";
-import Wallet from "components/wallet/wallet";
 
 interface props {
   children: React.ReactNode

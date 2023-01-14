@@ -1,18 +1,13 @@
 import { createContext, ReactNode, useContext, useState } from "react";
 import { SecretNetworkClient } from "secretjs";
+import { WalletContextType } from "types/wallet.types";
 
-//Set up the wallet context
-interface walletContextType {
-  wallet: SecretNetworkClient;
-  login: (wallet: SecretNetworkClient) => void;
-  logout: () => void;
-}
-const walletContextDefaultValues: walletContextType = {
+const walletContextDefaultValues: WalletContextType = {
   wallet: new SecretNetworkClient({ url: '', chainId: '' }),
   login: (wallet: SecretNetworkClient) => { },
   logout: () => { }
 }
-const WalletContext = createContext<walletContextType>(walletContextDefaultValues);
+const WalletContext = createContext<WalletContextType>(walletContextDefaultValues);
 
 export const useWallet = () => {
    return useContext(WalletContext);
