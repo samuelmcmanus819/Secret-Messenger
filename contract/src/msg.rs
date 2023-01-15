@@ -2,7 +2,7 @@ use cosmwasm_std::Addr;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::state::Message;
+use crate::state::{EnrichedMessage};
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct InstantiateMsg {
@@ -32,5 +32,5 @@ pub struct UsersResponse {
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct MessageResponse {
-    pub messages: Vec<Message>
+    pub messages: Vec<EnrichedMessage>
 }

@@ -28,11 +28,16 @@ pub const MESSAGES_KEY: &[u8] = b"messages";
 pub struct Config {
   pub name: String,
 }
-
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct Message {
   pub timestamp: Timestamp,
   pub content: String
+}
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
+pub struct EnrichedMessage {
+  pub timestamp: Timestamp,
+  pub content: String,
+  pub sender: String
 }
 
 pub static CONFIG: Item<Config> = Item::new(CONFIG_KEY);

@@ -2,7 +2,6 @@
 The secret messenger contract is the backend for the Secret Messenger DApp
 
 ## Future Work
-- Make the message query do a reverse query and combine the messages
 - Implement permissioned viewing (see SNIP-20 permissioned viewing in SCRT docs)
 - Implement connection-orientation
 - Implement groups
