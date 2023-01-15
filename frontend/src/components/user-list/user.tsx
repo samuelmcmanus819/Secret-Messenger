@@ -2,7 +2,7 @@ import { useChattingUser } from "contexts/chatting-user-context";
 import { UserType } from "types/user.types";
 
 const User = (user: UserType) => {
-  const { chattingUser, selectUser, deselectUser } = useChattingUser();
+  const { chattingUser, selectUser } = useChattingUser();
 
   const userSelected = () => {
     selectUser(user);
