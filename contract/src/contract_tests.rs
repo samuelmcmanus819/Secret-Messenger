@@ -113,6 +113,7 @@ fn add_user() {
 
 #[test]
 fn single_user_two_names() {
+  //Set up dependencies and single user's wallet
   let mut deps = mock_dependencies_with_balance(&[Coin {
       denom: "token".to_string(),
       amount: Uint128::new(2),
@@ -124,9 +125,12 @@ fn single_user_two_names() {
           amount: Uint128::new(2),
       }],
   );
+  //Instantiate the contract
   execute_instantiate(deps.as_mut(), info.clone());
+  //Successfully register the user
   execute_register_user(deps.as_mut(), info.clone(), String::from("user1"));
-  execute_register_user(deps.as_mut(), info.clone(), String::from("user2"));
+  let add_user_msg: ExecuteMsg = ExecuteMsg::Register { username: String::from("user2") };
+  execute(deps.as_mut(), mock_env(), info, add_user_msg).unwrap_err();
 
   let users: Vec<User> = query_all_users(deps.as_ref());
   assert_eq!(1, users.len());
@@ -134,6 +138,7 @@ fn single_user_two_names() {
 
 #[test]
 fn two_users_one_name() {
+  //Set up dependencies and the first user's wallet
   let mut deps = mock_dependencies_with_balance(&[Coin {
     denom: "token".to_string(),
     amount: Uint128::new(2),
@@ -145,9 +150,11 @@ fn two_users_one_name() {
           amount: Uint128::new(2),
       }],
   );
+  //Instantiate the contract and register the first user
   execute_instantiate(deps.as_mut(), info.clone());
   execute_register_user(deps.as_mut(), info.clone(), String::from("user1"));
 
+  //Attempt to register a second user's wallet with the same username as user 1
   let user2_info: MessageInfo = mock_info(
     "anyone",
     &[Coin {
@@ -156,7 +163,7 @@ fn two_users_one_name() {
     }],
   );
   let add_user_msg: ExecuteMsg = ExecuteMsg::Register { username: String::from("user1") };
-  execute(deps.as_mut(), mock_env(), info, add_user_msg).unwrap_err();
+  execute(deps.as_mut(), mock_env(), user2_info, add_user_msg).unwrap_err();
 }
 
 #[test]
@@ -181,6 +188,7 @@ fn self_not_in_chattable_users() {
 
   #[test]
   fn message_send_works() {
+    //Set up dependencies and first user's wallet
     let mut deps = mock_dependencies_with_balance(&[Coin {
       denom: "token".to_string(),
       amount: Uint128::new(2),
@@ -192,9 +200,11 @@ fn self_not_in_chattable_users() {
         amount: Uint128::new(2),
       }],
     );
+    //Instantiate the contract and register the first user
     execute_instantiate(deps.as_mut(), user1_info.clone());
     execute_register_user(deps.as_mut(), user1_info.clone(), String::from("user1"));
 
+    //Set up the second user's wallet and register them
     let user2_info: MessageInfo = mock_info(
       "anyone",
       &[Coin {
@@ -202,8 +212,9 @@ fn self_not_in_chattable_users() {
         amount: Uint128::new(2),
       }],
     );
-    execute_register_user(deps.as_mut(), user1_info.clone(), String::from("user2"));
+    execute_register_user(deps.as_mut(), user2_info.clone(), String::from("user2"));
 
+    //Send a message and verify that you can see it regardless of who's called the sender vs recipient
     execute_send_message(deps.as_mut(), user1_info.clone(), user2_info.clone().sender, String::from("Hi"));
     let messages: Vec<EnrichedMessage> = query_messages(deps.as_ref(), user2_info.clone(), user1_info.clone().sender);
     assert_eq!(1, messages.len());
@@ -216,6 +227,7 @@ fn self_not_in_chattable_users() {
 
   #[test]
   fn message_to_nonexistent_user_fails() {
+    //Set up dependencies and first user's wallet
     let mut deps = mock_dependencies_with_balance(&[Coin {
       denom: "token".to_string(),
       amount: Uint128::new(2),
@@ -227,9 +239,11 @@ fn self_not_in_chattable_users() {
         amount: Uint128::new(2),
       }],
     );
+    //Instantiate the contract and register the first user
     execute_instantiate(deps.as_mut(), user1_info.clone());
     execute_register_user(deps.as_mut(), user1_info.clone(), String::from("user1"));
 
+    //Set up the second user's wallet but don't register them
     let user2_info: MessageInfo = mock_info(
       "anyone",
       &[Coin {
@@ -238,6 +252,7 @@ fn self_not_in_chattable_users() {
       }],
     );
 
+    //Send a message to the unregistered user and verify that it fails
     let send_msg: ExecuteMsg = ExecuteMsg::SendMessage { recipient: user2_info.sender.clone(), message: String::from("Hi") };
     execute(deps.as_mut(), mock_env(), user1_info, send_msg).unwrap_err();
   }

@@ -10,7 +10,7 @@ use cosmwasm_std::{
   Storage, 
   Addr, 
   StdResult, 
-  Timestamp 
+  Timestamp, StdError 
 };
 use cosmwasm_storage::{
   singleton, 
@@ -66,16 +66,16 @@ impl UsersStore {
       None => { vec![] }
     };
 
-    //Check if the user is already registered
-    let mut user_exists = false;
+    //Check if the user's address is already registered
     for user in loaded_users.clone(){
-      if user.address == user_to_add.address{
-        user_exists = true;
+      if user.address == user_to_add.address {
+        return Result::Err(StdError::GenericErr { msg: String::from("User already registered") })
+      }
+      if user.name == user_to_add.name {
+        return Result::Err(StdError::GenericErr { msg: String::from("Username already taken") })
       }
     }
-    if !user_exists{
-      loaded_users.extend(vec![user_to_add]);
-    }
+    loaded_users.extend(vec![user_to_add]);
 
     //Update the users list
     USERS.save(store, &loaded_users)
@@ -91,16 +91,18 @@ impl MessagesStore {
   }
 
   pub fn add_message(store: &mut dyn Storage, user1: &Addr, user2: &Addr, msg: Message) -> StdResult<()> {
+    //Load the existing messages between the two communicating users
     let messages: Item<Vec<Message>> = (MESSAGES.add_suffix(user1.as_str().as_bytes())).add_suffix(user2.as_str().as_bytes());
     let loaded_messages = messages
       .may_load(store)?;
-
     let mut loaded_messages: Vec<Message> = match loaded_messages{
       Some(messages) => { messages }
       None => { vec![] }
     };
+    //Add the current messages to the list of messages between the users
     loaded_messages.extend(vec![msg]);
 
+    //Save the state of their messages
     messages.save(store, &loaded_messages)
   }
 

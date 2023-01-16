@@ -5,7 +5,7 @@ use cosmwasm_std::{
   StdResult, 
   Response, 
   entry_point, 
-  Addr, 
+  Addr, StdError, 
 };
 
 use crate::{
@@ -54,6 +54,28 @@ fn try_register(deps: DepsMut, _env: Env, info: MessageInfo, username: String) -
 }
 
 fn try_send_message(deps: DepsMut, env: Env, info: MessageInfo, recipient: Addr, message: String) -> StdResult<Response> {
+  //Load the list of registered users
+  let users = UsersStore::load(deps.storage)?;
+  let users = match users{
+    Some(users) => { users },
+    None => { vec![] }
+  };
+
+  //Check if the sender and recipient both exist
+  let mut users_exist: [bool; 2] = [false, false];
+  for user in users {
+    if user.address == info.sender.clone() {
+      users_exist[0] = true;
+    }
+    if user.address == recipient {
+      users_exist[1] = true;
+    }
+  }
+  //Error out if the sender or recipient is unregistered
+  if users_exist[0] == false || users_exist[1] == false {
+    return Result::Err(StdError::GenericErr { msg: String::from("You can only send messages to a registered user") })
+  }
+
   let full_message: Message = Message {
     content: message,
     timestamp: env.block.time
