@@ -24,7 +24,6 @@ pub enum QueryMsg {
     GetMessages { self_address: Addr, user2: Addr }
 }
 
-// We define a custom struct for each query response
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct UsersResponse {
     pub users: Vec<User>,

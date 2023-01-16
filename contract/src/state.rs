@@ -24,6 +24,7 @@ pub const USERS_KEY: &[u8] = b"users";
 pub const CONNECTION_KEY: &[u8] = b"connections";
 pub const MESSAGES_KEY: &[u8] = b"messages";
 
+//The config is used to store some info about the contract
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct Config {
   pub name: String,
@@ -33,11 +34,15 @@ pub struct User {
   pub name: String,
   pub address: Addr
 }
+//The messages are what's actually stored in the contract
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct Message {
   pub timestamp: Timestamp,
   pub content: String
 }
+//Enriched messages are what's returned to the user. 
+//These include the sender of the message so we know which side to display
+//the message on
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct EnrichedMessage {
   pub timestamp: Timestamp,
@@ -45,19 +50,24 @@ pub struct EnrichedMessage {
   pub sender: String
 }
 
+//Store the configuration and users list as items in contract state
 pub static CONFIG: Item<Config> = Item::new(CONFIG_KEY);
 pub static USERS: Item<Vec<User>> = Item::new(USERS_KEY);
 
+//Create a store for the users. This is used to interact with the items in contract state
 pub struct UsersStore {}
 impl UsersStore {
+  //Define the process for loading users from the contract state
   pub fn load(store: &dyn Storage) -> StdResult<Option<Vec<User>>> {
     USERS.may_load(store)
   }
 
+  //Define the process for updating the contract state
   pub fn save(store: &mut dyn Storage, users_to_add: Vec<User>) -> StdResult<()> {
     USERS.save(store, &users_to_add)
   }
 
+  //Define the process for adding a user to the contract state
   pub fn register_user(store: &mut dyn Storage, user_to_add: User) -> StdResult<()> {
     //Grab the current state of the users list
     let loaded_users: Option<Vec<User>> = USERS.may_load(store)?;
@@ -82,16 +92,23 @@ impl UsersStore {
   }
 }
 
+//Store the messages list as items in contract state
 pub static MESSAGES: Item<Vec<Message>> = Item::new(MESSAGES_KEY);
+//Create a store for the messages. This is used to interact with the items in contract state
 pub struct MessagesStore {}
 impl MessagesStore {
+  //Define the process to load messages from the contract state
   pub fn load<'a>(store: &'a dyn Storage, user1: &Addr, user2: &Addr) -> StdResult<Option<Vec<Message>>>  {
+    //Load the messages between two users.
+    //User 1 and User 2's addresses are added on as suffixes since they're not defined in the message struct
     let messages: Item<Vec<Message>> = (MESSAGES.add_suffix(user1.as_str().as_bytes())).add_suffix(user2.as_str().as_bytes());
     messages.may_load(store)
   }
 
+  //Define the process to add a message to the contract state
   pub fn add_message(store: &mut dyn Storage, user1: &Addr, user2: &Addr, msg: Message) -> StdResult<()> {
     //Load the existing messages between the two communicating users
+    //User 1 and User 2's addresses are added on as suffixes since they're not defined in the message struct
     let messages: Item<Vec<Message>> = (MESSAGES.add_suffix(user1.as_str().as_bytes())).add_suffix(user2.as_str().as_bytes());
     let loaded_messages = messages
       .may_load(store)?;
@@ -106,6 +123,7 @@ impl MessagesStore {
     messages.save(store, &loaded_messages)
   }
 
+  //Define the process for updating the message state
   pub fn save(store: &mut dyn Storage, user1: &Addr, user2: &Addr, msgs: Vec<Message>) -> StdResult<()> {
     let messages = (MESSAGES.add_suffix(user1.as_str().as_bytes())).add_suffix(user2.as_str().as_bytes());
     messages.save(store, &msgs)

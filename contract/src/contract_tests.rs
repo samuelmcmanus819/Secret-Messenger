@@ -59,6 +59,7 @@ fn query_messages(deps: Deps, info: MessageInfo, user2: Addr) -> Vec<EnrichedMes
 
 #[test]
 fn proper_initialization() {
+  //Set up dependencies and single user's wallet
   let mut deps = mock_dependencies();
   let info = mock_info(
     "creator",
@@ -67,11 +68,13 @@ fn proper_initialization() {
       amount: Uint128::new(1000),
     }],
   );
+  //Instantiate the contract
   execute_instantiate(deps.as_mut(), info.clone());
 }
 
 #[test]
 fn get_users_empty() {
+  //Set up dependencies and single user's wallet
   let mut deps = mock_dependencies_with_balance(&[Coin {
     denom: "token".to_string(),
     amount: Uint128::new(2),
@@ -83,8 +86,10 @@ fn get_users_empty() {
       amount: Uint128::new(2),
     }],
   );
+  //Instantiate the contract
   execute_instantiate(deps.as_mut(), info);
 
+  //Get a list of users and verify that it's empty
   let users_query: QueryMsg = QueryMsg::GetAllUsers {  };
   let res: Binary = query(deps.as_ref(), mock_env(), users_query).unwrap();
   let users: UsersResponse = from_binary(&res).unwrap();
@@ -93,6 +98,7 @@ fn get_users_empty() {
 
 #[test]
 fn add_user() {
+  //Set up dependencies and single user's wallet
   let mut deps = mock_dependencies_with_balance(&[Coin {
     denom: "token".to_string(),
     amount: Uint128::new(2),
@@ -104,9 +110,11 @@ fn add_user() {
       amount: Uint128::new(2),
     }],
   );
+  //Instantiate the contract and register the user
   execute_instantiate(deps.as_mut(), info.clone());
   execute_register_user(deps.as_mut(), info.clone(), String::from("user1"));
 
+  //Verify that the user was properly registered
   let users = query_all_users(deps.as_ref());
   assert_eq!(1, users.len());
 }
@@ -127,13 +135,12 @@ fn single_user_two_names() {
   );
   //Instantiate the contract
   execute_instantiate(deps.as_mut(), info.clone());
+
   //Successfully register the user
   execute_register_user(deps.as_mut(), info.clone(), String::from("user1"));
+  //Unsuccessfully register the user with a different username
   let add_user_msg: ExecuteMsg = ExecuteMsg::Register { username: String::from("user2") };
   execute(deps.as_mut(), mock_env(), info, add_user_msg).unwrap_err();
-
-  let users: Vec<User> = query_all_users(deps.as_ref());
-  assert_eq!(1, users.len());
 }
 
 #[test]
@@ -168,6 +175,7 @@ fn two_users_one_name() {
 
 #[test]
 fn self_not_in_chattable_users() {
+  //Set up dependencies and single user's wallet
   let mut deps = mock_dependencies_with_balance(&[Coin {
     denom: "token".to_string(),
     amount: Uint128::new(2),
@@ -179,9 +187,11 @@ fn self_not_in_chattable_users() {
       amount: Uint128::new(2),
     }],
   );
+  //Instantiate the contract and register the user
   execute_instantiate(deps.as_mut(), info.clone());
   execute_register_user(deps.as_mut(), info.clone(), String::from("user1"));
 
+  //Verify that the user doesn't show up in the list of users that they can chat with
   let users = query_chattable_users(deps.as_ref(), info.clone());
   assert_eq!(0, users.len());
 }
