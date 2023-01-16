@@ -29,6 +29,11 @@ pub struct Config {
   pub name: String,
 }
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
+pub struct User {
+  pub name: String,
+  pub address: Addr
+}
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct Message {
   pub timestamp: Timestamp,
   pub content: String
@@ -41,29 +46,38 @@ pub struct EnrichedMessage {
 }
 
 pub static CONFIG: Item<Config> = Item::new(CONFIG_KEY);
-pub static USERS: Item<Vec<Addr>> = Item::new(USERS_KEY);
+pub static USERS: Item<Vec<User>> = Item::new(USERS_KEY);
 
 pub struct UsersStore {}
 impl UsersStore {
-  pub fn load(store: &dyn Storage) -> StdResult<Option<Vec<Addr>>> {
+  pub fn load(store: &dyn Storage) -> StdResult<Option<Vec<User>>> {
     USERS.may_load(store)
   }
 
-  pub fn save(store: &mut dyn Storage, users_to_add: Vec<Addr>) -> StdResult<()> {
+  pub fn save(store: &mut dyn Storage, users_to_add: Vec<User>) -> StdResult<()> {
     USERS.save(store, &users_to_add)
   }
 
-  pub fn add_users(store: &mut dyn Storage, user_to_add: Addr) -> StdResult<()> {
-    let loaded_users: Option<Vec<Addr>> = USERS.may_load(store)?;
-    let mut loaded_users: Vec<Addr> = match loaded_users{
+  pub fn register_user(store: &mut dyn Storage, user_to_add: User) -> StdResult<()> {
+    //Grab the current state of the users list
+    let loaded_users: Option<Vec<User>> = USERS.may_load(store)?;
+    let mut loaded_users: Vec<User> = match loaded_users{
       Some(user) => { user },
       None => { vec![] }
     };
 
-    if !loaded_users.contains(&user_to_add){
+    //Check if the user is already registered
+    let mut user_exists = false;
+    for user in loaded_users.clone(){
+      if user.address == user_to_add.address{
+        user_exists = true;
+      }
+    }
+    if !user_exists{
       loaded_users.extend(vec![user_to_add]);
     }
 
+    //Update the users list
     USERS.save(store, &loaded_users)
   }
 }

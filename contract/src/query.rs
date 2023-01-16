@@ -1,6 +1,6 @@
 use cosmwasm_std::{entry_point, Deps, Env, StdResult, Binary, to_binary, Addr};
 
-use crate::{msg::{QueryMsg, UsersResponse, MessageResponse}, state::{UsersStore, MessagesStore, Message, EnrichedMessage}};
+use crate::{msg::{QueryMsg, UsersResponse, MessageResponse}, state::{UsersStore, MessagesStore, Message, EnrichedMessage, User}};
 
 #[entry_point]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
@@ -12,7 +12,7 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
 }
 
 fn get_all_users(deps: Deps) -> StdResult<UsersResponse> {
-    let users: Option<Vec<Addr>> = UsersStore::load(deps.storage)?;
+    let users: Option<Vec<User>> = UsersStore::load(deps.storage)?;
     match users{
         Some(users) => { return Ok(UsersResponse { users }) },
         None => { return Ok(UsersResponse { users: vec![] }) }
@@ -20,12 +20,12 @@ fn get_all_users(deps: Deps) -> StdResult<UsersResponse> {
 }
 
 fn get_chattable_users(deps: Deps, self_address: Addr) -> StdResult<UsersResponse> {
-  let users: Option<Vec<Addr>> = UsersStore::load(deps.storage)?;
-  let mut users: Vec<Addr> = match users {
+  let users: Option<Vec<User>> = UsersStore::load(deps.storage)?;
+  let mut users: Vec<User> = match users {
     Some(users) =>  users, 
     None => vec![]
   };
-  let index: Option<usize> = users.iter().position(|r| r == &self_address);
+  let index: Option<usize> = users.iter().position(|r| r.address == self_address);
 
   match index {
     Some(index) => { users.remove(index); },

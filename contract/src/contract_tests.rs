@@ -8,7 +8,7 @@ use crate::msg::{
   ExecuteMsg, MessageResponse
 };
 use crate::query::query;
-use crate::state::{EnrichedMessage};
+use crate::state::{EnrichedMessage, User};
 
 use cosmwasm_std::{
   testing::*, 
@@ -26,8 +26,8 @@ fn execute_instantiate(deps: DepsMut, info: MessageInfo) {
   let _res: Response = instantiate(deps, mock_env(), info, init_msg).unwrap();
 }
 
-fn execute_connect_user(deps: DepsMut, info: MessageInfo) {
-  let add_user_msg: ExecuteMsg = ExecuteMsg::Connect {  };
+fn execute_register_user(deps: DepsMut, info: MessageInfo, username: String) {
+  let add_user_msg: ExecuteMsg = ExecuteMsg::Register { username };
   let _res: Response = execute(deps, mock_env(), info, add_user_msg).unwrap();
 }
 
@@ -36,14 +36,14 @@ fn execute_send_message(deps: DepsMut, info: MessageInfo, recipient: Addr, messa
   let _res: Response = execute(deps, mock_env(), info, send_msg).unwrap();
 }
 
-fn query_all_users(deps: Deps) -> Vec<Addr> {
+fn query_all_users(deps: Deps) -> Vec<User> {
   let users_query: QueryMsg = QueryMsg::GetAllUsers {  };
   let res: Binary = query(deps, mock_env(), users_query).unwrap();
   let users: UsersResponse = from_binary(&res).unwrap();
   users.users
 }
 
-fn query_chattable_users(deps: Deps, info: MessageInfo) -> Vec<Addr> {
+fn query_chattable_users(deps: Deps, info: MessageInfo) -> Vec<User> {
   let users_query: QueryMsg = QueryMsg::GetChattableUsers { self_address: info.sender.clone() };
   let res: Binary = query(deps, mock_env(), users_query).unwrap();
   let users: UsersResponse = from_binary(&res).unwrap();
@@ -105,14 +105,14 @@ fn add_user() {
     }],
   );
   execute_instantiate(deps.as_mut(), info.clone());
-  execute_connect_user(deps.as_mut(), info.clone());
+  execute_register_user(deps.as_mut(), info.clone(), String::from("user1"));
 
   let users = query_all_users(deps.as_ref());
   assert_eq!(1, users.len());
 }
 
 #[test]
-fn add_user_twice() {
+fn single_user_two_names() {
   let mut deps = mock_dependencies_with_balance(&[Coin {
       denom: "token".to_string(),
       amount: Uint128::new(2),
@@ -125,11 +125,38 @@ fn add_user_twice() {
       }],
   );
   execute_instantiate(deps.as_mut(), info.clone());
-  execute_connect_user(deps.as_mut(), info.clone());
-  execute_connect_user(deps.as_mut(), info.clone());
+  execute_register_user(deps.as_mut(), info.clone(), String::from("user1"));
+  execute_register_user(deps.as_mut(), info.clone(), String::from("user2"));
 
-  let users: Vec<Addr> = query_all_users(deps.as_ref());
+  let users: Vec<User> = query_all_users(deps.as_ref());
   assert_eq!(1, users.len());
+}
+
+#[test]
+fn two_users_one_name() {
+  let mut deps = mock_dependencies_with_balance(&[Coin {
+    denom: "token".to_string(),
+    amount: Uint128::new(2),
+  }]);
+  let info = mock_info(
+      "creator",
+      &[Coin {
+          denom: "token".to_string(),
+          amount: Uint128::new(2),
+      }],
+  );
+  execute_instantiate(deps.as_mut(), info.clone());
+  execute_register_user(deps.as_mut(), info.clone(), String::from("user1"));
+
+  let user2_info: MessageInfo = mock_info(
+    "anyone",
+    &[Coin {
+      denom: "token".to_string(),
+      amount: Uint128::new(2),
+    }],
+  );
+  let add_user_msg: ExecuteMsg = ExecuteMsg::Register { username: String::from("user1") };
+  execute(deps.as_mut(), mock_env(), info, add_user_msg).unwrap_err();
 }
 
 #[test]
@@ -146,7 +173,7 @@ fn self_not_in_chattable_users() {
     }],
   );
   execute_instantiate(deps.as_mut(), info.clone());
-  execute_connect_user(deps.as_mut(), info.clone());
+  execute_register_user(deps.as_mut(), info.clone(), String::from("user1"));
 
   let users = query_chattable_users(deps.as_ref(), info.clone());
   assert_eq!(0, users.len());
@@ -166,7 +193,7 @@ fn self_not_in_chattable_users() {
       }],
     );
     execute_instantiate(deps.as_mut(), user1_info.clone());
-    execute_connect_user(deps.as_mut(), user1_info.clone());
+    execute_register_user(deps.as_mut(), user1_info.clone(), String::from("user1"));
 
     let user2_info: MessageInfo = mock_info(
       "anyone",
@@ -175,7 +202,7 @@ fn self_not_in_chattable_users() {
         amount: Uint128::new(2),
       }],
     );
-    execute_connect_user(deps.as_mut(), user1_info.clone());
+    execute_register_user(deps.as_mut(), user1_info.clone(), String::from("user2"));
 
     execute_send_message(deps.as_mut(), user1_info.clone(), user2_info.clone().sender, String::from("Hi"));
     let messages: Vec<EnrichedMessage> = query_messages(deps.as_ref(), user2_info.clone(), user1_info.clone().sender);
@@ -185,5 +212,33 @@ fn self_not_in_chattable_users() {
     let messages: Vec<EnrichedMessage> = query_messages(deps.as_ref(), user1_info.clone(), user2_info.clone().sender);
     assert_eq!(1, messages.len());
     assert_eq!("Hi", messages[0].content);
+  }
+
+  #[test]
+  fn message_to_nonexistent_user_fails() {
+    let mut deps = mock_dependencies_with_balance(&[Coin {
+      denom: "token".to_string(),
+      amount: Uint128::new(2),
+    }]);
+    let user1_info: MessageInfo = mock_info(
+      "creator",
+      &[Coin {
+        denom: "token".to_string(),
+        amount: Uint128::new(2),
+      }],
+    );
+    execute_instantiate(deps.as_mut(), user1_info.clone());
+    execute_register_user(deps.as_mut(), user1_info.clone(), String::from("user1"));
+
+    let user2_info: MessageInfo = mock_info(
+      "anyone",
+      &[Coin {
+        denom: "token".to_string(),
+        amount: Uint128::new(2),
+      }],
+    );
+
+    let send_msg: ExecuteMsg = ExecuteMsg::SendMessage { recipient: user2_info.sender.clone(), message: String::from("Hi") };
+    execute(deps.as_mut(), mock_env(), user1_info, send_msg).unwrap_err();
   }
 }

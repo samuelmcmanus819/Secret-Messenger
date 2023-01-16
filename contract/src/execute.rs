@@ -14,7 +14,7 @@ use crate::{
     Config, 
     config, 
     MessagesStore, 
-    Message
+    Message, User
   }, 
   msg::{
     ExecuteMsg, 
@@ -43,13 +43,13 @@ pub fn instantiate(
 #[entry_point]
 pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> StdResult<Response> {
   match msg {
-    ExecuteMsg::Connect {} => try_connect(deps, env, info),
+    ExecuteMsg::Register { username } => try_register(deps, env, info, username),
     ExecuteMsg::SendMessage { recipient, message } => try_send_message(deps, env, info, recipient, message)
   }
 }
 
-fn try_connect(deps: DepsMut, _env: Env, info: MessageInfo) -> StdResult<Response> {
-  UsersStore::add_users(deps.storage, info.sender.clone())?;
+fn try_register(deps: DepsMut, _env: Env, info: MessageInfo, username: String) -> StdResult<Response> {
+  UsersStore::register_user(deps.storage, User{ name: username, address: info.sender.clone() })?;
   Ok(Response::default())
 }
 
