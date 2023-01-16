@@ -28,7 +28,7 @@ Note: If this doesn't work, then visit the [Secret Network](https://github.com/s
 9. Get the address of the contract `secretd query compute list-contract-by-code $CODE_ID`
 
 #### Add Users
-1. Execute an add user command `secretd tx compute execute $CONTRACT_ADDRESS '{ "connect": { } }' --from a --keyring-backend test`
+1. Execute an add user command `secretd tx compute execute $CONTRACT_ADDRESS '{ "register": { "username": <your-username> } }' --from <wallet-name>`
 
 Note: You'll need to execute the above command from two different wallets to send messages back and forth.
 
@@ -56,7 +56,7 @@ secretcli keys add <a-name> --recover
 7. Find the address of the code `secretcli query compute list-contract-by-code $CODE_ID`
 
 #### Add Users
-1. Execute an add user command `secretcli tx compute execute $CONTRACT_ADDRESS '{ "connect": { } }' --from <wallet-name>`
+1. Execute an add user command `secretcli tx compute execute $CONTRACT_ADDRESS '{ "register": { "username": <your-username> } }' --from <wallet-name>`
 
 Note: You'll need to execute the above command from two different wallets to send messages back and forth.
 
