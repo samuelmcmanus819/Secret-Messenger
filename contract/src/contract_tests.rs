@@ -5,7 +5,7 @@ use crate::msg::{
   InstantiateMsg, 
   QueryMsg, 
   UsersResponse, 
-  ExecuteMsg, MessageResponse
+  ExecuteMsg, MessageResponse, SingleUserResponse
 };
 use crate::query::query;
 use crate::state::{EnrichedMessage, User};
@@ -48,6 +48,13 @@ fn query_chattable_users(deps: Deps, info: MessageInfo) -> Vec<User> {
   let res: Binary = query(deps, mock_env(), users_query).unwrap();
   let users: UsersResponse = from_binary(&res).unwrap();
   users.users
+}
+
+fn query_single_user(deps: Deps, info: MessageInfo, search_address: Addr) -> Option<User> {
+  let user_query: QueryMsg = QueryMsg::GetSingleUserByAddress { search_address };
+  let res: Binary = query(deps, mock_env(), user_query).unwrap();
+  let user: SingleUserResponse = from_binary(&res).unwrap();
+  user.user
 }
 
 fn query_messages(deps: Deps, info: MessageInfo, user2: Addr) -> Vec<EnrichedMessage> {
@@ -194,6 +201,52 @@ fn self_not_in_chattable_users() {
   //Verify that the user doesn't show up in the list of users that they can chat with
   let users = query_chattable_users(deps.as_ref(), info.clone());
   assert_eq!(0, users.len());
+}
+
+#[test]
+fn get_single_user_works_successfully() {
+  //Set up dependencies and single user's wallet
+  let mut deps = mock_dependencies_with_balance(&[Coin {
+    denom: "token".to_string(),
+    amount: Uint128::new(2),
+  }]);
+  let info: MessageInfo = mock_info(
+    "creator",
+    &[Coin {
+      denom: "token".to_string(),
+      amount: Uint128::new(2),
+    }],
+  );
+  //Instantiate the contract and register the user
+  execute_instantiate(deps.as_mut(), info.clone());
+  execute_register_user(deps.as_mut(), info.clone(), String::from("user1"));
+
+  //Verify that the user exists in a single user query
+  let user = query_single_user(deps.as_ref(), info.clone(), info.sender.clone());
+  assert!(user.is_some());
+}
+
+#[test]
+fn get_nonexistent_user_returns_none() {
+  //Set up dependencies and single user's wallet
+  let mut deps = mock_dependencies_with_balance(&[Coin {
+    denom: "token".to_string(),
+    amount: Uint128::new(2),
+  }]);
+  let info: MessageInfo = mock_info(
+    "creator",
+    &[Coin {
+      denom: "token".to_string(),
+      amount: Uint128::new(2),
+    }],
+  );
+  //Instantiate the contract and register the user
+  execute_instantiate(deps.as_mut(), info.clone());
+  execute_register_user(deps.as_mut(), info.clone(), String::from("user1"));
+
+  //Verify that the user doesn't show up in the list of users that they can chat with
+  let user = query_single_user(deps.as_ref(), info.clone(), Addr::unchecked("rando"));
+  assert!(user.is_none());
 }
 
   #[test]
