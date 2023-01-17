@@ -1,10 +1,11 @@
 import { ReactNode } from "react"
 
 export type UserListType = {
-  users: string[]
+  users: UserType[]
 }
 
 export type UserType = {
+  name: string,
   address: string
 }
 
@@ -16,4 +17,12 @@ export type UserContextType = {
 
 export type UserContextProviderPropsType = {
   children: ReactNode;
+}
+
+export type SingleUserQueryResponseType = {
+  user: UserType
+}
+
+export type RegisterFormProps = {
+  submitForm: (username: string) => void
 }

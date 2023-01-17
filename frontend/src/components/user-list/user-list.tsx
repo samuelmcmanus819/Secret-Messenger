@@ -9,7 +9,7 @@ const UserList = ({ users }: UserListType) => {
         {users.map((user) => {
           return (
             <li>
-              <User address={user}/>
+              <User address={user.address} name={user.name}/>
             </li>
           )
         })}

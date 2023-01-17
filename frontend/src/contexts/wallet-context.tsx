@@ -4,8 +4,10 @@ import { WalletContextProviderPropsType, WalletContextType } from "types/wallet.
 
 const walletContextDefaultValues: WalletContextType = {
   wallet: new SecretNetworkClient({ url: '', chainId: '' }),
+  username: '',
   login: (wallet: SecretNetworkClient) => { },
-  logout: () => { }
+  logout: () => { },
+  setUsername: () => { }
 }
 const WalletContext = createContext<WalletContextType>(walletContextDefaultValues);
 
@@ -14,6 +16,7 @@ export const useWallet = () => {
 }
 export const WalletProvider = ({ children }: WalletContextProviderPropsType) => {
   const [wallet, setWallet] = useState<SecretNetworkClient>(new SecretNetworkClient({ url: '', chainId: '' }));
+  const [username, setUsername] = useState<string>('');
 
   const login = (wallet: SecretNetworkClient) => {
     setWallet(wallet);
@@ -21,10 +24,13 @@ export const WalletProvider = ({ children }: WalletContextProviderPropsType) => 
   const logout = () => {
     setWallet(new SecretNetworkClient({ url: '', chainId: '' }));
   }
+
   const value = {
     wallet,
+    username,
     login,
-    logout
+    logout,
+    setUsername
   }
   return (
     <WalletContext.Provider value={value}>

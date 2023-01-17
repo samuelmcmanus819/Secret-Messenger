@@ -3,12 +3,12 @@ import { useChattingUser } from "contexts/chatting-user-context";
 import { useWallet } from "contexts/wallet-context";
 import { useEffect, useState } from "react";
 import { SecretNetworkClient } from "secretjs";
-import { UserListType } from "types/user.types";
+import { UserListType, UserType } from "types/user.types";
 
 const Users = () => {
   const contractAddress: string = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ?? '';
-  const [chattableUsers, setChattableUsers] = useState<string[]>([]);
-  const [searchUsers, setSearchUsers] = useState<string[]>([]);
+  const [chattableUsers, setChattableUsers] = useState<UserType[]>([]);
+  const [searchUsers, setSearchUsers] = useState<UserType[]>([]);
   const { wallet } = useWallet();
   const { deselectUser } = useChattingUser();
 
@@ -18,7 +18,7 @@ const Users = () => {
 
   const search = (e: React.ChangeEvent<HTMLInputElement>) => {
     if(e.target.value != ''){
-      setSearchUsers(chattableUsers.filter(user => user.includes(e.target.value)))
+      setSearchUsers(chattableUsers.filter(user => user.address.includes(e.target.value)))
     } else{
       setSearchUsers(chattableUsers)
     }

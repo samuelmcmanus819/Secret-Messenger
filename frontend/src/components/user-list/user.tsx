@@ -11,7 +11,7 @@ const User = (user: UserType) => {
   return(
     <button onClick={userSelected} className={`w-[130px] h-[30px] overflow-hidden text-dark-text 
               ${user.address == chattingUser.address ? 'bg-primary-ultralight' : ''}`}>
-      {user.address}
+      {user.name}
     </button>
   )
 }
