@@ -1,5 +1,5 @@
 import Wallet from "components/wallet/wallet";
-import UserList from "./users";
+import UserList from "components/user-list/user-list";
 
 const SecondaryColumn = () => {
   return (

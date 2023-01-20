@@ -1,5 +1,5 @@
 import { SecretNetworkClient } from "secretjs";
-import { SingleUserQueryResponseType, UserType } from "types/user.types";
+import { SingleUserQueryResponseType } from "types/user.types";
 
 export const getUsername = async(wallet: SecretNetworkClient): Promise<string> => {
   const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ?? '';
@@ -22,7 +22,6 @@ export const registerUser = async(wallet: SecretNetworkClient, username: string)
     code_hash: codeHash,
     msg: { register: { username: username } }
   }, { gasLimit: 100_000 });
-  console.log(registered)
   if (registered.rawLog.includes('Username already taken')) { return 'Username already taken' }
   else if (registered.rawLog.includes('User already registered')) { return 'Your wallet is already registered' }
   else{ return 'Success' }

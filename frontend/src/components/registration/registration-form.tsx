@@ -1,9 +1,7 @@
 import { Formik, Form, Field } from 'formik';
-import { useState } from 'react';
 import { RegisterFormProps } from 'types/user.types';
 
-const RegistrationForm = ({ submitForm }: RegisterFormProps) => {
-  const [username, setUsername] = useState('');
+const RegistrationForm = ({ submitForm, errorMessage }: RegisterFormProps) => {
   const initialFormValue = {
     username: ''
   }
@@ -22,6 +20,7 @@ const RegistrationForm = ({ submitForm }: RegisterFormProps) => {
               spellcheck={false}
               value={values.username}
             />
+            <p>{errorMessage}</p>
             <button type="submit">
               Submit
             </button>

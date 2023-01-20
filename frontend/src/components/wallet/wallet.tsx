@@ -1,14 +1,18 @@
 import { useState } from 'react'
-import { useWallet } from 'contexts/wallet-context';
 import { connectKeplrWallet, connectLeapWallet } from "components/wallet/wallet-login";
 import { registerUser, getUsername } from 'components/registration/registration';
 import RegistrationForm from 'components/registration/registration-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from 'redux/store';
+import { connect, disconnect, setUsername, setUserRegistered } from 'redux/walletSlice';
 
 const Wallet = () => {
   const [connecting, setConnecting] = useState(false);
-  const [userRegistered, setUserRegistered] = useState(true);
   const [error, setError] = useState('');
-  const { username, wallet, login, logout, setUsername } = useWallet();
+  const wallet = useSelector((state: RootState) => state.wallet.signingClient);
+  const username = useSelector((state: RootState) => state.wallet.username);
+  const userRegistered = useSelector((state: RootState) => state.wallet.userRegistered);
+  const dispatch = useDispatch();
 
   const connectClicked = () => {
     setConnecting(true)
@@ -17,13 +21,13 @@ const Wallet = () => {
   const connectLeapClicked = () => {
     connectLeapWallet().then(wallet => { 
       if(wallet) { 
-        login(wallet);
+        dispatch(connect(wallet));
         getUsername(wallet).then(name => { 
           if (name != ''){
-            setUsername(name);
-            setUserRegistered(true);
+            dispatch(setUsername(name));
+            dispatch(setUserRegistered(true));
           } else{
-            setUserRegistered(false)
+            dispatch(setUserRegistered(false));
           }
         }); 
       } 
@@ -34,13 +38,13 @@ const Wallet = () => {
   const connectKeplrClicked = () => {
     connectKeplrWallet().then(wallet => { 
       if(wallet) { 
-        login(wallet);
+        dispatch(connect(wallet));
         getUsername(wallet).then(name => { 
           if (name != ''){
-            setUsername(name);
-            setUserRegistered(true);
+            dispatch(setUsername(name));
+            dispatch(setUserRegistered(true));
           } else{
-            setUserRegistered(false)
+            dispatch(setUserRegistered(false));
           }
         });
       } 
@@ -49,7 +53,7 @@ const Wallet = () => {
   }
 
   const disconnectWallet = () => {
-    logout();
+    dispatch(disconnect());
     setConnecting(false);
   }
 
@@ -58,8 +62,8 @@ const Wallet = () => {
       if(res != 'Username already taken' && res != 'Your wallet is already registered'){
         getUsername(wallet).then(name => { 
           if (name != ''){
-            setUsername(name);
-            setUserRegistered(true);
+            dispatch(setUsername(name));
+            dispatch(setUserRegistered(true));
           } else{
             setError('Registration failed');
           }
@@ -81,7 +85,7 @@ const Wallet = () => {
         <button onClick={connectKeplrClicked}>{connecting ? 'Connect Keplr' : ''}</button>
       </span>
       <span className={`${userRegistered ? 'w-0 h-0' : 'w-96 h-52 bg-primary-ultralight fixed top-[100px] left-[60px] z-5 shadow-[0px_5px_7.5px_rgba(0,0,0,0.20)]'}`}>
-        {!userRegistered && <RegistrationForm submitForm={submitRegistrationForm}/>}
+        {!userRegistered && <RegistrationForm submitForm={submitRegistrationForm} errorMessage={error}/>}
       </span>
     </div>
     

@@ -6,7 +6,7 @@ interface props {
 
 const Layout = ({ children }: props) => {
   return (
-    <div className="h-96 w-[500px] bg-primary-main">
+    <div className="flex flex-col h-96 w-[500px] bg-primary-main">
       <header className='bg-primary-light '>
         <HamburgerMenu /> 
       </header>

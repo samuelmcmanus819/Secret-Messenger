@@ -1,11 +1,14 @@
-import { useChattingUser } from "contexts/chatting-user-context";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "redux/store";
+import { chooseUser } from "redux/usersSlice";
 import { UserType } from "types/user.types";
 
 const User = (user: UserType) => {
-  const { chattingUser, selectUser } = useChattingUser();
+  const chattingUser = useSelector((state: RootState) => state.users.chosenUser);
+  const dispatch = useDispatch();
 
   const userSelected = () => {
-    selectUser(user);
+    dispatch(chooseUser(user))
   }
 
   return(
