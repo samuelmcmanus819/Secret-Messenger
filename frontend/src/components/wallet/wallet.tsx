@@ -54,6 +54,7 @@ const Wallet = () => {
 
   const disconnectWallet = () => {
     dispatch(disconnect());
+    dispatch(setUsername(''));
     setConnecting(false);
   }
 
@@ -80,9 +81,11 @@ const Wallet = () => {
             onClick={wallet.address == "" ? connectClicked : disconnectWallet}>
         {username== "" ? 'Connect Wallet': username}
       </button>
-      <span className={`${connecting ? 'w-96 h-52 bg-primary-ultralight fixed top-[100px] left-[60px] z-5 shadow-[0px_5px_7.5px_rgba(0,0,0,0.20)]' : 'w-0 h-0' }`}>
-        <button onClick={connectLeapClicked}>{connecting ? 'Connect Leap' : ''}</button>
-        <button onClick={connectKeplrClicked}>{connecting ? 'Connect Keplr' : ''}</button>
+      <span className={`${connecting ? 'flex flex-col justify-center w-96 h-52 bg-primary-ultralight fixed top-[100px] left-[60px] z-5 shadow-[0px_5px_7.5px_rgba(0,0,0,0.20)] px-6' : 'w-0 h-0' }`}>
+        <div className='flex flex-col w-full'>
+          <button className={`${connecting ? 'my-4 border border-primary-main shadow-[0px_5px_7.5px_rgba(0,0,0,0.20)] z-6 h-16 text-xl' : ''}`} onClick={connectLeapClicked}>{connecting ? 'Connect Leap' : ''}</button>
+          <button className={`${connecting ? 'my-4 border border-primary-main shadow-[0px_5px_7.5px_rgba(0,0,0,0.20)] z-6 h-16 text-xl' : ''}`} onClick={connectKeplrClicked}>{connecting ? 'Connect Keplr' : ''}</button>
+        </div>
       </span>
       <span className={`${userRegistered ? 'w-0 h-0' : 'w-96 h-52 bg-primary-ultralight fixed top-[100px] left-[60px] z-5 shadow-[0px_5px_7.5px_rgba(0,0,0,0.20)]'}`}>
         {!userRegistered && <RegistrationForm submitForm={submitRegistrationForm} errorMessage={error}/>}

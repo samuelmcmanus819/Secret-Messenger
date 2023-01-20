@@ -39,7 +39,7 @@ const Messenger = () => {
               name="message"
               placeholder="Enter a message..."
               spellcheck={false}
-              className='flex w-full mx-2 mb-1 h-8 bg-primary-ultralight px-2 focus:outline-none text-light-text'
+              className='flex w-full mx-2 mb-4 h-8 bg-primary-ultralight px-2 focus:outline-none text-light-text'
               value={values.message}
             />
           </Form>

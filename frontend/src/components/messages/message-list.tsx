@@ -21,11 +21,11 @@ const MessageList = () => {
   }, [chosenUser.address])
 
   return (
-    <ul className="flex flex-col justify-end h-[290px] mt-2">
+    <ul className="flex flex-col justify-end h-[290px] mt-2 mx-2">
         {(messages && messages.length > 0) ? messages.map((message) => {
           return (
             <li>
-              <Message content={message.content} timestamp={message.timestamp}/>
+              <Message content={message.content} timestamp={message.timestamp} sender={message.sender}/>
             </li>
           )
         }) : ''}
