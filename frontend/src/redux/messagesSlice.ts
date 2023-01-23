@@ -12,7 +12,7 @@ export const messagesSlice = createSlice({
   reducers: {
     updateMessages: (state, action: PayloadAction<MessageType[]>) => {
       state.messages = action.payload
-    },
+    }
   }
 })
 

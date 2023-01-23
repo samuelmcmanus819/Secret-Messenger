@@ -2,9 +2,11 @@ import { SecretNetworkClient } from "secretjs";
 import { SingleUserQueryResponseType } from "types/user.types";
 
 export const getUsername = async(wallet: SecretNetworkClient): Promise<string> => {
+  const codeHash = process.env.NEXT_PUBLIC_CODE_HASH ?? '';
   const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ?? '';
   const user: SingleUserQueryResponseType = await wallet.query.compute.queryContract({ 
     contract_address: contractAddress, 
+    code_hash: codeHash,
     query: { get_single_user_by_address: { search_address: wallet.address } } 
   });
   if(user.user == null){

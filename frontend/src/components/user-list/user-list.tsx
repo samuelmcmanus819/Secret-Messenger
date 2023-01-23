@@ -8,6 +8,7 @@ import { UserType } from "types/user.types";
 
 
 const UserList = () => {
+  const codeHash = process.env.NEXT_PUBLIC_CODE_HASH ?? '';
   const contractAddress: string = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ?? '';
   const [searchUsers, setSearchUsers] = useState<UserType[]>([]);
   const wallet = useSelector((state: RootState) => state.wallet.signingClient);
@@ -15,7 +16,7 @@ const UserList = () => {
   const dispatch = useDispatch();
 
   const getUsers = (wallet: SecretNetworkClient, contractAddress: string): Promise<UserType[]> => {
-    return wallet.query.compute.queryContract({ contract_address: contractAddress, query: { get_chattable_users: { self_address: wallet.address } } })
+    return wallet.query.compute.queryContract({ contract_address: contractAddress, code_hash: codeHash, query: { get_chattable_users: { self_address: wallet.address } } })
   }
 
   const search = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +43,7 @@ const UserList = () => {
       <ul className="mt-2">
         {searchUsers.map((user) => {
           return (
-            <li>
+            <li key={user.address}>
               <User address={user.address} name={user.name}/>
             </li>
           )

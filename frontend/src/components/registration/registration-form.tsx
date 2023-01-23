@@ -17,7 +17,7 @@ const RegistrationForm = ({ submitForm, errorMessage }: RegisterFormProps) => {
               as="input"
               name="username"
               placeholder="Enter your new username"
-              spellcheck={false}
+              spellCheck={false}
               value={values.username}
             />
             <p>{errorMessage}</p>
