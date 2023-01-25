@@ -1,6 +1,12 @@
-use cosmwasm_std::{entry_point, Deps, Env, StdResult, Binary, to_binary, Addr, StdError};
+use cosmwasm_std::{ entry_point, Deps, Env, StdResult, Binary, to_binary, Addr };
 
-use crate::{msg::{QueryMsg, UsersResponse, MessageResponse, SingleUserResponse}, state::{UsersStore, MessagesStore, Message, EnrichedMessage, User}};
+use crate::{
+  msg::{
+    QueryMsg, UsersResponse, MessageResponse, SingleUserResponse
+  }, 
+  state::{
+    UsersStore, MessagesStore, Message, EnrichedMessage, User
+}};
 
 //Route the user's query to the appropriate function
 #[entry_point]
@@ -92,5 +98,6 @@ fn get_messages(deps: Deps, self_address: Addr, user2: Addr) -> StdResult<Messag
     messages.push(EnrichedMessage { timestamp: message.timestamp, content: String::from(&message.content), sender: String::from(user2.as_str()) });
   }
 
+  messages.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
   Ok(MessageResponse { messages: messages })
 }

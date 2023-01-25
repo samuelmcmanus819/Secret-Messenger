@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateMessages } from "redux/messagesSlice";
 import { RootState } from "redux/store";
-import { MessageType } from "types/message.types";
 
 const MessageList = () => {
   const messages = useSelector((state: RootState) => state.messages.messages);
@@ -13,15 +12,19 @@ const MessageList = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if(chosenUser.address != ''){
-      loadMessages(wallet, chosenUser).then(loadedMessages => dispatch(updateMessages(JSON.parse(JSON.stringify(loadedMessages)).messages)));
-    } else{
-      dispatch(updateMessages([]));
-    }
+    const interval = setInterval(() => {
+      if(chosenUser.address != ''){
+        loadMessages(wallet, chosenUser).then(loadedMessages => dispatch(updateMessages(JSON.parse(JSON.stringify(loadedMessages)).messages)));
+      } else{
+        dispatch(updateMessages([]));
+      }
+      return () => clearInterval(interval);
+    }, 5000);
   }, [chosenUser.address])
 
   return (
-    <ul className="flex flex-col justify-end h-[290px] mt-2 mx-2">
+    <div className="flex flex-col justify-end h-[290px] max-h-[290px] mt-2 mx-2 overflow-y-auto">
+      <ul className="max-h-[290px]">
         {(messages && messages.length > 0) ? messages.map((message) => {
           return (
             <li>
@@ -30,6 +33,7 @@ const MessageList = () => {
           )
         }) : ''}
       </ul>
+    </div>
   );
 }
 

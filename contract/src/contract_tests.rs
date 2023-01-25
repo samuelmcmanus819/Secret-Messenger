@@ -50,7 +50,7 @@ fn query_chattable_users(deps: Deps, info: MessageInfo) -> Vec<User> {
   users.users
 }
 
-fn query_single_user(deps: Deps, info: MessageInfo, search_address: Addr) -> Option<User> {
+fn query_single_user(deps: Deps, _info: MessageInfo, search_address: Addr) -> Option<User> {
   let user_query: QueryMsg = QueryMsg::GetSingleUserByAddress { search_address };
   let res: Binary = query(deps, mock_env(), user_query).unwrap();
   let user: SingleUserResponse = from_binary(&res).unwrap();

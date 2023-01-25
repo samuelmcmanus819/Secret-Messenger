@@ -50,7 +50,7 @@ secretcli keys add <a-name> --recover
 ```
 2. Change directories to this directory. 
 3. Build the code by running `make build`
-4. Upload the contract to the local network  `secretcli tx compute store contract.wasm.gz --from <wallet-name> --gas 1000000 -y`
+4. Upload the contract to the local network  `secretcli tx compute store contract.wasm.gz --from <wallet-name> --gas 2000000 -y`
 5. Get the code ID of the contract `secretcli query compute list-code`. Typically your code ID will be the latest one, but you can verify by ensuring that the `creator` is your wallet ID
 6. Instantiate the contract `secretcli tx compute instantiate $CODE_ID '{ "name": "secret messenger beta" }' --from testnet --label "my secret messenger rrandomstring" -y`
 7. Find the address of the code `secretcli query compute list-contract-by-code $CODE_ID`
