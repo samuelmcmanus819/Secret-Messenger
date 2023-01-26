@@ -2,8 +2,9 @@
 The secret messenger frontend is a browser extension frontend for the Secret Messenger
 
 ## Future Work
-- Make messages auto-retrieve every x seconds/minutes
 - Finish the frontend UI
+- Make messages only viewable to sender and recipient
+- Prevent full re-render when message is sent
 - Publish to the Chrome Web Store
 
 ## Usage

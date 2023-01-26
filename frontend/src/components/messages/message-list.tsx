@@ -11,15 +11,22 @@ const MessageList = () => {
   const chosenUser = useSelector((state: RootState) => state.users.chosenUser);
   const dispatch = useDispatch();
 
+  const setMessages = async() => {
+    if(chosenUser.address != ''){
+      const loadedMessages = await loadMessages(wallet, chosenUser);
+      if(loadMessages.length != messages.length){
+        dispatch(updateMessages(loadedMessages));
+      }
+    } else {
+      await dispatch(updateMessages([]));
+    }
+  }
+
   useEffect(() => {
     const interval = setInterval(() => {
-      if(chosenUser.address != ''){
-        loadMessages(wallet, chosenUser).then(loadedMessages => dispatch(updateMessages(JSON.parse(JSON.stringify(loadedMessages)).messages)));
-      } else{
-        dispatch(updateMessages([]));
-      }
-      return () => clearInterval(interval);
-    }, 5000);
+      setMessages()
+    }, 3000);
+    return () => clearInterval(interval);
   }, [chosenUser.address])
 
   return (
